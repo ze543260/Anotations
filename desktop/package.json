@@ -1,0 +1,59 @@
+{
+  "name": "anotations-desktop",
+  "version": "1.0.0",
+  "description": "Aplicação desktop para geração de anotações usando IA",
+  "main": "public/electron.js",
+  "homepage": "./",
+  "private": true,
+  "scripts": {
+    "react-start": "react-scripts start",
+    "electron-start": "electron .",
+    "dev": "concurrently \"npm:react-start\" \"npm:electron-start\"",
+    "build": "react-scripts build",
+    "electron-build": "npm run build && electron-builder",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "axios": "^1.5.0",
+    "web-vitals": "^3.4.0"
+  },
+  "devDependencies": {
+    "electron": "^26.2.0",
+    "concurrently": "^8.2.0",
+    "wait-on": "^7.0.1",
+    "electron-builder": "^24.6.3"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "build": {
+    "appId": "com.anotations.desktop",
+    "productName": "Anotations",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "build/**/*",
+      "public/electron.js"
+    ]
+  }
+}

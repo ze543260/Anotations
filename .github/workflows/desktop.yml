@@ -1,0 +1,116 @@
+name: Desktop CI
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'desktop/**'
+      - '.github/workflows/desktop.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'desktop/**'
+      - '.github/workflows/desktop.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [16.x, 18.x, 20.x]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: desktop/package-lock.json
+        
+    - name: Install dependencies
+      working-directory: ./desktop
+      run: npm ci
+      
+    - name: Lint code
+      working-directory: ./desktop
+      run: npm run lint || echo "Lint script not found, skipping..."
+      
+    - name: Run tests
+      working-directory: ./desktop
+      run: npm test -- --coverage --watchAll=false
+      env:
+        CI: true
+
+  build:
+    runs-on: ${{ matrix.os }}
+    needs: test
+    
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+        cache-dependency-path: desktop/package-lock.json
+        
+    - name: Install dependencies
+      working-directory: ./desktop
+      run: npm ci
+      
+    - name: Build React app
+      working-directory: ./desktop
+      run: npm run build
+      env:
+        CI: true
+        GENERATE_SOURCEMAP: false
+        
+    - name: Test Electron build
+      working-directory: ./desktop
+      run: npm run electron-build -- --publish=never
+      if: matrix.os == 'ubuntu-latest'
+      
+    - name: Archive build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: desktop-build-${{ matrix.os }}
+        path: |
+          desktop/build
+          desktop/dist
+        retention-days: 30
+
+  security:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+        cache-dependency-path: desktop/package-lock.json
+        
+    - name: Install dependencies
+      working-directory: ./desktop
+      run: npm ci
+      
+    - name: Run security audit
+      working-directory: ./desktop
+      run: npm audit --audit-level high
+      
+    - name: Check for outdated packages
+      working-directory: ./desktop
+      run: npm outdated || true

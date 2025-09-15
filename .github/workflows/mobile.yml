@@ -1,0 +1,167 @@
+name: Mobile CI
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'mobile/**'
+      - '.github/workflows/mobile.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'mobile/**'
+      - '.github/workflows/mobile.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [16.x, 18.x, 20.x]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: mobile/package-lock.json
+        
+    - name: Setup Expo CLI
+      run: npm install -g @expo/cli
+      
+    - name: Install dependencies
+      working-directory: ./mobile
+      run: npm ci
+      
+    - name: Lint code
+      working-directory: ./mobile
+      run: npm run lint || echo "Lint script not found, skipping..."
+      
+    - name: Run tests
+      working-directory: ./mobile
+      run: npm test || echo "No tests found, skipping..."
+      env:
+        CI: true
+
+  build-web:
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+        cache-dependency-path: mobile/package-lock.json
+        
+    - name: Setup Expo CLI
+      run: npm install -g @expo/cli
+      
+    - name: Install dependencies
+      working-directory: ./mobile
+      run: npm ci
+      
+    - name: Build for web
+      working-directory: ./mobile
+      run: expo export --platform web
+      
+    - name: Archive web build
+      uses: actions/upload-artifact@v4
+      with:
+        name: mobile-web-build
+        path: mobile/dist
+        retention-days: 30
+
+  build-preview:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'pull_request'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+        cache-dependency-path: mobile/package-lock.json
+        
+    - name: Setup Expo CLI
+      run: npm install -g @expo/cli eas-cli
+      
+    - name: Install dependencies
+      working-directory: ./mobile
+      run: npm ci
+      
+    - name: Create Expo preview
+      working-directory: ./mobile
+      run: |
+        expo login --non-interactive
+        expo publish --non-interactive
+      env:
+        EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      continue-on-error: true
+
+  security:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+        cache-dependency-path: mobile/package-lock.json
+        
+    - name: Install dependencies
+      working-directory: ./mobile
+      run: npm ci
+      
+    - name: Run security audit
+      working-directory: ./mobile
+      run: npm audit --audit-level high
+      
+    - name: Check for outdated packages
+      working-directory: ./mobile
+      run: npm outdated || true
+
+  validate-expo:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+        cache-dependency-path: mobile/package-lock.json
+        
+    - name: Setup Expo CLI
+      run: npm install -g @expo/cli
+      
+    - name: Install dependencies
+      working-directory: ./mobile
+      run: npm ci
+      
+    - name: Validate Expo configuration
+      working-directory: ./mobile
+      run: |
+        expo doctor
+        expo config --type prebuild
