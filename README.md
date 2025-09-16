@@ -1,45 +1,57 @@
 # 🤖 Anotations - Gerador de Anotações IA
 
-Uma aplicação multi-plataforma para geração de anotações inteligentes usando IA, desenvolvida com Node.js, React e React Native.
+Uma aplicação multi-plataforma para geração de anotações inteligentes usando IA, desenvolvida com **TypeScript**, Node.js, React e React Native.
 
 ![Architecture](https://img.shields.io/badge/Architecture-Monorepo-blue)
-![Backend](https://img.shields.io/badge/Backend-Node.js%20%2B%20Express-green)
-![Desktop](https://img.shields.io/badge/Desktop-React%20%2B%20Electron-blue)
-![Mobile](https://img.shields.io/badge/Mobile-React%20Native%20%2B%20Expo-purple)
+![TypeScript](https://img.shields.io/badge/TypeScript-100%25-blue)
+![Backend](https://img.shields.io/badge/Backend-Node.js%20%2B%20Express%20%2B%20TS-green)
+![Desktop](https://img.shields.io/badge/Desktop-React%20%2B%20Electron%20%2B%20TS-blue)
+![Mobile](https://img.shields.io/badge/Mobile-React%20Native%20%2B%20Expo%20%2B%20TS-purple)
 ![AI](https://img.shields.io/badge/AI-Google%20Gemini-orange)
 
 ## 📋 Visão Geral
 
 O **Anotations** é uma solução completa que permite gerar anotações personalizadas sobre qualquer tópico usando inteligência artificial. O sistema oferece:
 
-- **Backend API**: Servidor Node.js com integração ao Google Gemini AI
-- **Aplicação Desktop**: Interface Electron para Windows, macOS e Linux
-- **Aplicação Mobile**: App React Native para iOS e Android
+- **Backend API**: Servidor Node.js + TypeScript com integração ao Google Gemini AI
+- **Aplicação Desktop**: Interface React + TypeScript + Electron para Windows, macOS e Linux
+- **Aplicação Mobile**: App React Native + TypeScript + Expo para iOS e Android
 
 ## 🏗️ Arquitetura do Projeto
 
 ```
 anotations/
-├── backend/              # API Node.js + Express
+├── backend/              # API Node.js + Express + TypeScript
 │   ├── src/
-│   │   ├── server.js
-│   │   └── routes/
+│   │   ├── server.ts
+│   │   ├── routes/
+│   │   │   └── generateNotes.ts
+│   │   └── tests/
+│   │       └── server.test.ts
+│   ├── dist/             # Arquivos compilados TypeScript
 │   ├── package.json
+│   ├── tsconfig.json
+│   ├── jest.config.js
 │   └── .env.example
-├── desktop/              # Aplicação React + Electron
+├── desktop/              # Aplicação React + Electron + TypeScript
 │   ├── src/
-│   │   ├── App.jsx
+│   │   ├── App.tsx
+│   │   ├── index.tsx
 │   │   └── components/
 │   ├── public/
 │   │   ├── index.html
 │   │   └── electron.js
-│   └── package.json
-├── mobile/               # Aplicação React Native + Expo
+│   ├── package.json
+│   └── tsconfig.json
+├── mobile/               # Aplicação React Native + Expo + TypeScript
 │   ├── src/
-│   │   ├── App.jsx
+│   │   ├── App.tsx
 │   │   └── components/
+│   ├── App.tsx
 │   ├── app.json
-│   └── package.json
+│   ├── package.json
+│   ├── tsconfig.json
+│   └── babel.config.js
 ├── .github/
 │   └── workflows/        # CI/CD GitHub Actions
 └── README.md
@@ -48,6 +60,7 @@ anotations/
 ## 🚀 Funcionalidades
 
 ### ✨ Principais
+
 - 📝 Geração de anotações personalizadas por IA
 - 🎯 Níveis de conhecimento (Iniciante, Intermediário, Avançado)
 - 💻 Interface desktop multiplataforma
@@ -56,6 +69,7 @@ anotations/
 - 📋 Copiar e compartilhar anotações
 
 ### 🛠️ Técnicas
+
 - 🔒 Autenticação segura com API Keys
 - 🌐 API RESTful bem estruturada
 - 🎨 Interface responsiva e moderna
@@ -63,52 +77,92 @@ anotations/
 - 📊 Monitoramento e logs
 - 🧪 Testes automatizados
 
-## 📦 Instalação
+## � Tecnologias
+
+### Backend (TypeScript)
+
+- **Node.js** + **Express** + **TypeScript**
+- **Google Gemini AI** - Geração inteligente de conteúdo
+- **Jest** + **TypeScript** - Testes automatizados
+- **ts-node** - Execução TypeScript em desenvolvimento
+- **ESLint** + **Prettier** - Qualidade de código
+
+### Desktop (React + TypeScript)
+
+- **React** + **TypeScript** + **Electron**
+- **Styled Components** - Estilização tipada
+- **Axios** - Cliente HTTP com tipos
+- **Webpack** + **TypeScript** - Bundling e transpilação
+
+### Mobile (React Native + TypeScript)
+
+- **React Native** + **TypeScript** + **Expo**
+- **Expo Vector Icons** - Ícones tipados
+- **React Navigation** + **TypeScript** - Navegação tipada
+- **AsyncStorage** - Armazenamento local
+
+### DevOps e Qualidade
+
+- **GitHub Actions** - CI/CD para TypeScript
+- **TypeScript 5.2.2** - Type safety em todo o sistema
+- **ESLint** + **@typescript-eslint** - Análise estática
+- **Prettier** - Formatação de código
+- **Husky** - Git hooks para qualidade
+
+## �📦 Instalação
 
 ### Pré-requisitos
-- Node.js 16+ 
+
+- Node.js 16+
 - npm ou yarn
 - Chave API do Google Gemini
 - Git
 
 ### 1️⃣ Clone o repositório
+
 ```bash
 git clone https://github.com/seu-usuario/anotations.git
 cd anotations
 ```
 
-### 2️⃣ Configure o Backend
+### 2️⃣ Configure o Backend (TypeScript)
+
 ```bash
 cd backend
 npm install
 cp .env.example .env
 # Configure sua GEMINI_API_KEY no arquivo .env
-npm run dev
+npm run build  # Compila TypeScript para JavaScript
+npm run dev     # Desenvolvimento com hot reload
 ```
 
-### 3️⃣ Configure o Desktop
+### 3️⃣ Configure o Desktop (React + TypeScript)
+
 ```bash
 cd ../desktop
 npm install
-npm run dev
+npm run dev     # React + Electron com TypeScript
 ```
 
-### 4️⃣ Configure o Mobile
+### 4️⃣ Configure o Mobile (React Native + TypeScript)
+
 ```bash
 cd ../mobile
 npm install
-npx expo start
+npx expo start  # Expo com TypeScript
 ```
 
 ## ⚙️ Configuração
 
 ### Backend (.env)
+
 ```env
 PORT=4000
 GEMINI_API_KEY=sua_chave_gemini_aqui
 ```
 
 ### Obter Chave API Gemini
+
 1. Acesse [Google AI Studio](https://makersuite.google.com/app/apikey)
 2. Crie uma nova API Key
 3. Configure no arquivo `.env` do backend
@@ -116,6 +170,7 @@ GEMINI_API_KEY=sua_chave_gemini_aqui
 ## 🎮 Como Usar
 
 ### Desktop
+
 1. Abra a aplicação
 2. Digite o tópico que deseja estudar
 3. Selecione seu nível de conhecimento
@@ -123,6 +178,7 @@ GEMINI_API_KEY=sua_chave_gemini_aqui
 5. Copie ou salve suas anotações
 
 ### Mobile
+
 1. Abra o app
 2. Insira o tópico de estudo
 3. Escolha o nível (iniciante/intermediário/avançado)
@@ -134,6 +190,7 @@ GEMINI_API_KEY=sua_chave_gemini_aqui
 ### Scripts Disponíveis
 
 #### Backend
+
 ```bash
 npm start          # Produção
 npm run dev        # Desenvolvimento com nodemon
@@ -141,6 +198,7 @@ npm test           # Executar testes
 ```
 
 #### Desktop
+
 ```bash
 npm run dev        # Desenvolvimento (React + Electron)
 npm run build      # Build de produção
@@ -148,6 +206,7 @@ npm run electron-build  # Gerar executável
 ```
 
 #### Mobile
+
 ```bash
 npm start          # Expo desenvolvimento
 npm run android    # Build Android
@@ -156,6 +215,7 @@ npm run web        # Versão web
 ```
 
 ### 🌿 Workflow Git
+
 1. Crie uma feature branch: `git checkout -b feature/nova-funcionalidade`
 2. Faça suas alterações e commits
 3. Push: `git push origin feature/nova-funcionalidade`
@@ -177,6 +237,7 @@ cd mobile && npm test
 ## 📈 CI/CD
 
 O projeto inclui workflows GitHub Actions para:
+
 - ✅ Testes automatizados
 - 🔍 Análise de código
 - 🔒 Auditoria de segurança
@@ -208,6 +269,7 @@ O projeto inclui workflows GitHub Actions para:
 5. Abra um Pull Request
 
 ### 📝 Convenções
+
 - Use commits semânticos
 - Documente novas funcionalidades
 - Mantenha cobertura de testes
@@ -219,8 +281,9 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para de
 
 ## 👨‍💻 Autor
 
-**José Vinícius**
-- GitHub: [@seu-usuario](https://github.com/seu-usuario)
+**José Vitor Gomes Nascimento**
+
+- GitHub: [@seu-usuario](https://github.com/ze543260)
 - LinkedIn: [seu-linkedin](https://linkedin.com/in/seu-linkedin)
 - Email: seu-email@exemplo.com
 

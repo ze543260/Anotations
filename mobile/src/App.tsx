@@ -12,22 +12,42 @@ import {
   SafeAreaView,
   StatusBar,
   ActivityIndicator,
+  NativeSyntheticEvent,
+  TextInputChangeEventData,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { Ionicons } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
 import * as Haptics from "expo-haptics";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
+
+// Tipos
+type Level = "iniciante" | "intermediario" | "avancado";
+
+interface ApiResponse {
+  success: boolean;
+  data: {
+    topic: string;
+    level: string;
+    notes: string;
+    generatedAt: string;
+  };
+}
+
+interface ErrorResponse {
+  error: string;
+  message: string;
+}
 
 const API_BASE_URL = "http://192.168.1.100:4000/api"; // Ajuste para o IP da sua máquina
 
-export default function App() {
-  const [topic, setTopic] = useState("");
-  const [level, setLevel] = useState("intermediario");
-  const [notes, setNotes] = useState("");
-  const [loading, setLoading] = useState(false);
+export default function App(): JSX.Element {
+  const [topic, setTopic] = useState<string>("");
+  const [level, setLevel] = useState<Level>("intermediario");
+  const [notes, setNotes] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const handleGenerateNotes = async () => {
+  const handleGenerateNotes = async (): Promise<void> => {
     if (!topic.trim()) {
       Alert.alert("Erro", "Por favor, digite um tópico");
       return;
@@ -37,10 +57,13 @@ export default function App() {
     setNotes("");
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/generate-notes`, {
-        topic: topic.trim(),
-        level,
-      });
+      const response = await axios.post<ApiResponse>(
+        `${API_BASE_URL}/generate-notes`,
+        {
+          topic: topic.trim(),
+          level,
+        }
+      );
 
       if (response.data.success) {
         setNotes(response.data.data.notes);
@@ -48,16 +71,18 @@ export default function App() {
       } else {
         Alert.alert("Erro", "Erro ao gerar anotações");
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Erro:", error);
 
       let errorMessage = "Erro inesperado. Tente novamente.";
 
-      if (error.response?.data?.message) {
-        errorMessage = error.response.data.message;
+      const axiosError = error as AxiosError<ErrorResponse>;
+
+      if (axiosError.response?.data?.message) {
+        errorMessage = axiosError.response.data.message;
       } else if (
-        error.code === "ECONNREFUSED" ||
-        error.message.includes("Network Error")
+        axiosError.code === "ECONNREFUSED" ||
+        axiosError.message?.includes("Network Error")
       ) {
         errorMessage =
           "Não foi possível conectar com o servidor. Verifique se o backend está rodando e se o IP está correto.";
@@ -70,7 +95,7 @@ export default function App() {
     }
   };
 
-  const handleCopyNotes = async () => {
+  const handleCopyNotes = async (): Promise<void> => {
     if (notes) {
       await Clipboard.setStringAsync(notes);
       Alert.alert(
@@ -81,7 +106,7 @@ export default function App() {
     }
   };
 
-  const handleClearNotes = () => {
+  const handleClearNotes = (): void => {
     Alert.alert("Confirmar", "Tem certeza que deseja limpar as anotações?", [
       { text: "Cancelar", style: "cancel" },
       {
@@ -95,7 +120,7 @@ export default function App() {
     ]);
   };
 
-  const getLevelEmoji = (level) => {
+  const getLevelEmoji = (level: Level): string => {
     switch (level) {
       case "iniciante":
         return "🟢";
@@ -108,7 +133,7 @@ export default function App() {
     }
   };
 
-  const getLevelText = (level) => {
+  const getLevelText = (level: Level): string => {
     switch (level) {
       case "iniciante":
         return "Iniciante";
@@ -163,7 +188,7 @@ export default function App() {
               <View style={styles.pickerContainer}>
                 <Picker
                   selectedValue={level}
-                  onValueChange={setLevel}
+                  onValueChange={(itemValue: Level) => setLevel(itemValue)}
                   style={styles.picker}
                   enabled={!loading}
                 >
@@ -293,7 +318,6 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     padding: 20,
     marginBottom: 20,
-    backdropFilter: "blur(10px)",
   },
   inputGroup: {
     marginBottom: 20,

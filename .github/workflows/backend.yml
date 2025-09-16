@@ -2,91 +2,99 @@ name: Backend CI
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
     paths:
-      - 'backend/**'
-      - '.github/workflows/backend.yml'
+      - "backend/**"
+      - ".github/workflows/backend.yml"
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
     paths:
-      - 'backend/**'
-      - '.github/workflows/backend.yml'
+      - "backend/**"
+      - ".github/workflows/backend.yml"
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    
+
     strategy:
       matrix:
         node-version: [16.x, 18.x, 20.x]
-    
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-        cache-dependency-path: backend/package-lock.json
-        
-    - name: Install dependencies
-      working-directory: ./backend
-      run: npm ci
-      
-    - name: Lint code
-      working-directory: ./backend
-      run: npm run lint || echo "Lint script not found, skipping..."
-      
-    - name: Run tests
-      working-directory: ./backend
-      run: npm test || echo "No tests found, skipping..."
-      env:
-        NODE_ENV: test
-        
-    - name: Check for security vulnerabilities
-      working-directory: ./backend
-      run: npm audit --audit-level high
-      
-    - name: Test server startup
-      working-directory: ./backend
-      run: |
-        timeout 10s npm start &
-        sleep 5
-        curl -f http://localhost:4000/health || exit 1
-      env:
-        PORT: 4000
-        GEMINI_API_KEY: test_key
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: npm ci
+
+      - name: Type check
+        working-directory: ./backend
+        run: npm run type-check
+
+      - name: Lint code
+        working-directory: ./backend
+        run: npm run lint || echo "Lint script not found, skipping..."
+
+      - name: Build TypeScript
+        working-directory: ./backend
+        run: npm run build
+
+      - name: Run tests
+        working-directory: ./backend
+        run: npm test || echo "No tests found, skipping..."
+        env:
+          NODE_ENV: test
+
+      - name: Check for security vulnerabilities
+        working-directory: ./backend
+        run: npm audit --audit-level high
+
+      - name: Test server startup
+        working-directory: ./backend
+        run: |
+          timeout 10s npm start &
+          sleep 5
+          curl -f http://localhost:4000/health || exit 1
+        env:
+          PORT: 4000
+          GEMINI_API_KEY: test_key
 
   build:
     runs-on: ubuntu-latest
     needs: test
-    
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18.x'
-        cache: 'npm'
-        cache-dependency-path: backend/package-lock.json
-        
-    - name: Install dependencies
-      working-directory: ./backend
-      run: npm ci
-      
-    - name: Build application
-      working-directory: ./backend
-      run: npm run build || echo "No build script found"
-      
-    - name: Archive production artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: backend-dist
-        path: |
-          backend/dist
-          backend/package*.json
-        retention-days: 30
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18.x"
+          cache: "npm"
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: npm ci
+
+      - name: Build TypeScript
+        working-directory: ./backend
+        run: npm run build
+
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-dist
+          path: |
+            backend/dist
+            backend/package*.json
+          retention-days: 30

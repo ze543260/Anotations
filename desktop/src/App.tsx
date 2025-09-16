@@ -1,17 +1,37 @@
-import React, { useState } from "react";
-import axios from "axios";
+import React, { useState, FormEvent } from "react";
+import axios, { AxiosError } from "axios";
 import "./App.css";
+
+// Tipos
+type Level = "iniciante" | "intermediario" | "avancado";
+
+interface ApiResponse {
+  success: boolean;
+  data: {
+    topic: string;
+    level: string;
+    notes: string;
+    generatedAt: string;
+  };
+}
+
+interface ErrorResponse {
+  error: string;
+  message: string;
+}
 
 const API_BASE_URL = "http://localhost:4000/api";
 
-function App() {
-  const [topic, setTopic] = useState("");
-  const [level, setLevel] = useState("intermediario");
-  const [notes, setNotes] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+function App(): JSX.Element {
+  const [topic, setTopic] = useState<string>("");
+  const [level, setLevel] = useState<Level>("intermediario");
+  const [notes, setNotes] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
 
-  const handleGenerateNotes = async (e) => {
+  const handleGenerateNotes = async (
+    e: FormEvent<HTMLFormElement>
+  ): Promise<void> => {
     e.preventDefault();
 
     if (!topic.trim()) {
@@ -24,22 +44,27 @@ function App() {
     setNotes("");
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/generate-notes`, {
-        topic: topic.trim(),
-        level,
-      });
+      const response = await axios.post<ApiResponse>(
+        `${API_BASE_URL}/generate-notes`,
+        {
+          topic: topic.trim(),
+          level,
+        }
+      );
 
       if (response.data.success) {
         setNotes(response.data.data.notes);
       } else {
         setError("Erro ao gerar anotações");
       }
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("Erro:", err);
 
-      if (err.response?.data?.message) {
-        setError(err.response.data.message);
-      } else if (err.code === "ECONNREFUSED") {
+      const axiosError = err as AxiosError<ErrorResponse>;
+
+      if (axiosError.response?.data?.message) {
+        setError(axiosError.response.data.message);
+      } else if (axiosError.code === "ECONNREFUSED") {
         setError(
           "Não foi possível conectar com o servidor. Verifique se o backend está rodando."
         );
@@ -51,21 +76,23 @@ function App() {
     }
   };
 
-  const handleClearNotes = () => {
+  const handleClearNotes = (): void => {
     setNotes("");
     setError("");
   };
 
-  const handleCopyNotes = () => {
+  const handleCopyNotes = (): void => {
     if (notes) {
       navigator.clipboard.writeText(notes);
       // Feedback visual simples
       const button = document.getElementById("copy-btn");
-      const originalText = button.textContent;
-      button.textContent = "Copiado!";
-      setTimeout(() => {
-        button.textContent = originalText;
-      }, 2000);
+      if (button) {
+        const originalText = button.textContent;
+        button.textContent = "Copiado!";
+        setTimeout(() => {
+          button.textContent = originalText;
+        }, 2000);
+      }
     }
   };
 
@@ -96,7 +123,7 @@ function App() {
             <select
               id="level"
               value={level}
-              onChange={(e) => setLevel(e.target.value)}
+              onChange={(e) => setLevel(e.target.value as Level)}
               disabled={loading}
             >
               <option value="iniciante">🟢 Iniciante</option>
@@ -126,6 +153,7 @@ function App() {
                   onClick={handleCopyNotes}
                   className="action-btn copy-btn"
                   title="Copiar anotações"
+                  type="button"
                 >
                   📋 Copiar
                 </button>
@@ -133,6 +161,7 @@ function App() {
                   onClick={handleClearNotes}
                   className="action-btn clear-btn"
                   title="Limpar anotações"
+                  type="button"
                 >
                   🗑️ Limpar
                 </button>

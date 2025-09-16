@@ -1,13 +1,13 @@
-const express = require("express");
-const cors = require("cors");
-const dotenv = require("dotenv");
-const generateNotesRoute = require("./routes/generateNotes");
+import express, { Application, Request, Response, NextFunction } from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import generateNotesRoute from "./routes/generateNotes";
 
 // Configurar variáveis de ambiente
 dotenv.config();
 
-const app = express();
-const PORT = process.env.PORT || 4000;
+const app: Application = express();
+const PORT: number = parseInt(process.env.PORT || "4000", 10);
 
 // Middleware
 app.use(cors());
@@ -17,7 +17,7 @@ app.use(express.json());
 app.use("/api", generateNotesRoute);
 
 // Rota de teste
-app.get("/health", (req, res) => {
+app.get("/health", (req: Request, res: Response) => {
   res.json({
     status: "OK",
     message: "Anotations API is running!",
@@ -26,7 +26,7 @@ app.get("/health", (req, res) => {
 });
 
 // Middleware de tratamento de erros
-app.use((err, req, res, next) => {
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);
   res.status(500).json({
     error: "Algo deu errado!",
@@ -35,7 +35,7 @@ app.use((err, req, res, next) => {
 });
 
 // Middleware para rotas não encontradas
-app.use("*", (req, res) => {
+app.use("*", (req: Request, res: Response) => {
   res.status(404).json({
     error: "Rota não encontrada",
     message: `A rota ${req.originalUrl} não existe nesta API`,
@@ -47,3 +47,5 @@ app.listen(PORT, () => {
   console.log(`📝 API de Anotações disponível em http://localhost:${PORT}`);
   console.log(`🔍 Health check: http://localhost:${PORT}/health`);
 });
+
+export default app;
