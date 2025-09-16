@@ -58,7 +58,7 @@ router.post(
       }
 
       // Configurar o modelo
-      const model = genAI.getGenerativeModel({ 
+      const model = genAI.getGenerativeModel({
         model: "gemini-pro",
         systemInstruction: `Você é um assistente educacional especializado em transformar qualquer assunto em anotações didáticas claras, organizadas e acessíveis para estudantes de todos os níveis.
 
@@ -76,17 +76,21 @@ router.post(
 🎓 Adaptação por nível:
 - **Iniciante**: explicações simples, exemplos cotidianos
 - **Intermediário**: vocabulário técnico com explicações
-- **Avançado**: abordagem analítica e termos especializados`
+- **Avançado**: abordagem analítica e termos especializados`,
       });
 
       // Criar prompt personalizado baseado no nível
       const levelInstructions: Record<Level, string> = {
-        iniciante: "Nível INICIANTE: Use explicações simples, exemplos cotidianos e vocabulário acessível.",
-        intermediario: "Nível INTERMEDIÁRIO: Faça aprofundamento moderado com vocabulário técnico explicado.",
-        avancado: "Nível AVANÇADO: Use abordagem analítica, termos técnicos e contextualização acadêmica."
+        iniciante:
+          "Nível INICIANTE: Use explicações simples, exemplos cotidianos e vocabulário acessível.",
+        intermediario:
+          "Nível INTERMEDIÁRIO: Faça aprofundamento moderado com vocabulário técnico explicado.",
+        avancado:
+          "Nível AVANÇADO: Use abordagem analítica, termos técnicos e contextualização acadêmica.",
       };
 
-      const instruction = levelInstructions[level] || levelInstructions["intermediario"];
+      const instruction =
+        levelInstructions[level] || levelInstructions["intermediario"];
       const prompt = `${instruction}\n\nTópico: ${topic}\n\nGere anotações didáticas completas sobre este tópico seguindo as diretrizes do sistema.`;
 
       // Gerar conteúdo com Gemini

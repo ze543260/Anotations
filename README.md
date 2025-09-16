@@ -1,6 +1,41 @@
 # 🤖 Anotations - Gerador de Anotações IA
 
-Uma aplicação multi-plataforma para geração de anotações inteligentes usando IA, desenvolvida com **TypeScript**, Node.js, React e React Native.
+Uma aplicação multi-plata### 🛠️ Técnicas
+
+- 🔒 Autenticação segura com API Keys
+- 🌐 API RESTful bem estruturada
+- 🎨 Interface responsiva e moderna
+- 🔧 Hot reload para desenvolvimento
+- 📊 Monitoramento e logs
+- 🧪 Testes automatizados
+
+## 🤖 Google Gemini AI
+
+### 🎯 Integração Avançada
+
+O sistema utiliza o **Google Gemini 2.5 Pro** com configurações especializadas para geração de anotações educacionais:
+
+- **🎓 Sistema de Instruções**: Prompt otimizado para conteúdo didático
+- **📊 Streaming de Conteúdo**: Respostas em tempo real com chunks
+- **🔧 Configurações de Segurança**: Personalizada para conteúdo educacional
+- **🎯 Adaptação por Nível**: Conteúdo ajustado automaticamente
+
+### 📋 Níveis de Conhecimento
+
+| Nível                | Características                            | Público-Alvo                  |
+| -------------------- | ------------------------------------------ | ----------------------------- |
+| **🌟 Iniciante**     | Linguagem simples, exemplos cotidianos     | Estudantes iniciantes         |
+| **🎯 Intermediário** | Vocabulário técnico explicado              | Estudantes em desenvolvimento |
+| **🚀 Avançado**      | Abordagem analítica, termos especializados | Especialistas e acadêmicos    |
+
+### 🔄 Fluxo de Geração
+
+1. **Entrada**: Tópico + Nível de conhecimento
+2. **Processamento**: Gemini AI com instruções especializadas
+3. **Streaming**: Resposta em chunks para melhor UX
+4. **Saída**: Anotações formatadas e estruturadas
+
+## 🚀 Tecnologias geração de anotações inteligentes usando IA, desenvolvida com **TypeScript**, Node.js, React e React Native.
 
 ![Architecture](https://img.shields.io/badge/Architecture-Monorepo-blue)
 ![TypeScript](https://img.shields.io/badge/TypeScript-100%25-blue)
